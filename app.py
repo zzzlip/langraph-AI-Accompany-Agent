@@ -9,8 +9,7 @@ from flask_bcrypt import Bcrypt
 
 from werkzeug.utils import secure_filename
 
-from talk_agent import get_agent_and_checkpointer
-
+from main_agent import get_agent_and_checkpointer
 picture_dir_name = 'talk_picture'
 if not os.path.exists(picture_dir_name):
     os.makedirs(picture_dir_name)
@@ -284,7 +283,6 @@ def start_talk():
             # 从检查点获取对话的当前状态
             # 使用同步的 get_state 方法
             state = agent.get_state(thread_config).values
-
             print(f"开始对话，角色ID: {character_id}, 姓名: {character.name}")
             print("当前状态:", state)
             # 为代理准备输入
@@ -365,6 +363,7 @@ def start_talk():
             final_state_result = agent.get_state(thread_config)
             final_state = final_state_result.values if final_state_result else {}
             talk_number = final_state.get('talk_number', 0)
+            print(f"对话结束，当前对话次数: {talk_number}")
 
             # 检查是否生成朋友圈动态
             if talk_number > 0 and talk_number < 80 and talk_number % 30 == 0:
@@ -385,7 +384,7 @@ def start_talk():
                 yield sse_format({'type': 'event', 'event_name': 'new_moment_available'})
 
             # 检查是否生成日记
-            if talk_number == 80:
+            if talk_number == 60:
                 diary_thread_config = {"configurable": {"thread_id": generate_id}}
                 final_state['page'] = 'generate_diary'
                 # 使用同步流

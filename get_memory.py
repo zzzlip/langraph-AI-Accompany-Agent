@@ -9,7 +9,6 @@ class DatabaseManager:
     一个用于管理人物简介和聊天记忆的数据库操作类。
     【V4版 - Sync】支持同步操作，并直接存储和检索 LangChain 消息对象列表。
     """
-
     def __init__(self, db_path="memory_data.db"):
         """
         初始化数据库路径。连接将在每个同步方法中按需创建。
