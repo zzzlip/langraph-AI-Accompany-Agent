@@ -32,7 +32,6 @@ This is a Flask-based AI role-playing agent developed using the langgraph agent 
 
 ### 3. Memory System
 - The memory module is divided into two parts: 1. Short-term memory 2. Dormant long-term memory.
-- Short-term conversation memory: The threshold is set to 400 dialogue entries. Once exceeded, the memory is gradually cleared. Every 100 messages form a memory block, and the LLM generates several tags for each block, which are stored in the memory database.
 - Long-term memory: Like human memory, when asked about past events, we recall the scene. Similarly, the agent first checks if the user's question relates to short-term memory. If not, it retrieves relevant long-term memories by matching tags, effectively preventing memory loss.
 - Memory fusion mechanism: The memory module now primarily adopts a long-short term memory fusion approach. Through hook nodes in the langgraph workflow, short-term memory is automatically summarized and then stored in long-term memory.
 - RAG integration: Long-term memory integrates RAG (Retrieval-Augmented Generation) using ChromaDB vector store and HuggingFace embeddings for memory retrieval, enabling more accurate and contextually relevant memory recall.
@@ -113,11 +112,3 @@ Open your browser and go to `http://localhost:5000`
 - Ensure that the `uploads` and `talk_picture` directories have write permissions.
 - Valid API keys for AI services are required to use all features.
 
-## Areas for Improvement:
-- Poor concurrency: Since most people are unwilling to pay for Google models (too expensive), and although Google models are free, they have concurrency and speed limits, I did not implement asynchronous development. The entire project is synchronous. My original intention was to run it locally.
-- Text generation takes about 3-5 seconds (if an image is needed, it increases to ~8 seconds). Unlike simple chatbots, this project involves many additional steps (e.g., long-term memory retrieval, image generation), which adds processing time but enhances quality and experience.
-- No real-time text streaming: Since the reply text is generated within langgraph nodes, it's not straightforward to stream the output (would require callbacks or external message queues, which is complex - so I skipped it for simplicity!).
-
-## Summary
-
-This project is ideal for those learning langchain or langgraph for agent development, or for exploring prompt engineering (few-shot, COT, TOT) and workflow design. It also has strong potential for further development. For example, to enrich character personalities, you could integrate APIs for daily life information (e.g., trending topics, weather, search) and transform internal chains into react_agents. Additionally, the diary and Moments generation can be separated from the main agent and developed as independent agents using multi-agent architectures like swarm or supervisor, with research into faster and better inter-agent communication.
