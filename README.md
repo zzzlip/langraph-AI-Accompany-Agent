@@ -19,6 +19,7 @@ This is a Flask-based AI role-playing agent developed using the langgraph agent 
 - AI character diary system
 - The generation of Moments and diaries is managed using different threads in langgraph, allowing parallel generation without affecting chat performance. (Alternatively, a multi-agent architecture can be used for complex tasks, but since diary and Moments generation is relatively simple, merging them into one agent avoids the complexity of state transfer.)
 - I use the `gemeni_pro` model and a COT-style prompt architecture to deeply analyze short-term and long-term memories, better understand key events and character personalities, and capture chat habits for writing Moments and diaries.
+
 ![Project Image](朋友圈1.png)
 
 
@@ -26,18 +27,22 @@ This is a Flask-based AI role-playing agent developed using the langgraph agent 
 ![Project Image](朋友圈2.png)
 
 
+
 ![Project Image](日记图片.png)
+
 ### 3. Memory System
 - The memory module is divided into two parts: 1. Short-term memory 2. Dormant long-term memory.
 - Short-term conversation memory: The threshold is set to 400 dialogue entries. Once exceeded, the memory is gradually cleared. Every 100 messages form a memory block, and the LLM generates several tags for each block, which are stored in the memory database.
 - Long-term memory: Like human memory, when asked about past events, we recall the scene. Similarly, the agent first checks if the user's question relates to short-term memory. If not, it retrieves relevant long-term memories by matching tags, effectively preventing memory loss.
+- Memory fusion mechanism: The memory module now primarily adopts a long-short term memory fusion approach. Through hook nodes in the langgraph workflow, short-term memory is automatically summarized and then stored in long-term memory.
+- RAG integration: Long-term memory integrates RAG (Retrieval-Augmented Generation) using ChromaDB vector store and HuggingFace embeddings for memory retrieval, enabling more accurate and contextually relevant memory recall.
+- Concurrent search: The project implements concurrent search for both long-term and short-term memory, improving retrieval efficiency.
 
 ### 4. AI Model Integration
 - Support for multiple text generation LLM APIs:
   - Google Gemini
   - Qwen
   - Moonshot-Kimi
-  - DeepSeek
 - Image generation:
   - Google Gemini (free, but no concurrency; suitable for personal use only)
 
@@ -50,6 +55,8 @@ This is a Flask-based AI role-playing agent developed using the langgraph agent 
 - JWT: User authentication
 - Langchain/langgraph: LLM chains and agents
 - SQLite: Data storage
+- ChromaDB: Vector database for RAG implementation
+- HuggingFace Embeddings: For vector embeddings
 
 ### Frontend
 - Native JavaScript
@@ -60,24 +67,28 @@ This is a Flask-based AI role-playing agent developed using the langgraph agent 
 ## Directory Structure
 
 ```
-├── api_key.py          # API key configuration
-├── app.py              # Main Flask application
-├── base.py             # Base configuration and LLM settings
-├── chat_data.db        # Chat database (stores all chat logs, Moments, and diaries for characters)
-├── generate_talks.py   # Content generation for chats, images, Moments, and diaries
-├── get_memory.py       # Memory system
-├── memory_data.db      # Memory database
-├── talk_agent.py       # Agent architecture
-├── static/             # Static files
-│   ├── index.html    
-│   ├── script.js     
-│   └── style.css   
+├── api_key.py              # API key configuration
+├── app.py                  # Main Flask application
+├── base.py                 # Base configuration and LLM settings
+├── chat_data.db            # Chat database (stores all chat logs, Moments, and diaries for characters)
+├── generate_content.py     # Content generation for chats, images, Moments, and diaries
+├── get_memory.py           # Memory system - SQLite database operations for character profiles and chat memories
+├── get_character_full_data.py # Database operations for chat history, social posts, and diary entries
+├── memory_data.db          # Memory database for long-term memories
+├── main_agent.py           # Langgraph agent workflow definition
+├── memory.py               # Memory management with RAG integration using ChromaDB
+├── state.py                # State definitions for the langgraph agent
+├── requirements.txt        # Python dependencies
+├── static/                 # Static files
+│   ├── index.html
+│   ├── script.js
+│   └── style.css
 │     └── assets
 │            └── default_avatar.png (default character avatar, customizable)
 │            └── user_hand_portrait.jpg  (default user avatar)
-│ 
-├── uploads/            # User-uploaded character avatars
-└── talk_picture/       # AI-generated images
+│
+├── uploads/                # User-uploaded character avatars
+└── talk_picture/           # AI-generated images
 ```
 
 ## Running Instructions
